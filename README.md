@@ -31,9 +31,10 @@
   </a>
 </div>
 
-![Package Preview](/Resources/Preview.png)
+## Demo
+![Preview](/Resources/Preview.gif)
 
-## What this package offers
+## Features
 - **Control Center building blocks**: Drop-in, modern controls that feel native, inspired by iOS 26 Control Center.
 - **Interactive vertical sliders**: Fluid, springy sliders with glass aesthetics; show a single icon or automatically change icons by value steps (perfect for brightness or volume).
 - **Togglable buttons**: Polished Control Center–style buttons that can be icon-only or include a short label; visually respond to state.
@@ -42,7 +43,6 @@
 - **Highly customizable**: Configure icons, step thresholds, colors, and visual weight to match your brand or platform look.
 - **Accessible by design**: Works with Dynamic Type and VoiceOver labels/traits to ensure inclusive experiences.
 - **Cross‑platform SwiftUI**: Ready for iOS, macOS, watchOS, tvOS, and visionOS using a single Swift package.
-- **Lightweight and composable**: Use just what you need; components fit neatly into your existing SwiftUI layouts.
 
 ## Installation
 Required iOS, macOS, watchOS, tvOS or visionOS 26.0 or above.

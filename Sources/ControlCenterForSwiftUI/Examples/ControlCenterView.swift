@@ -11,12 +11,20 @@ struct ControlCenterView: View {
     @State private var brightness: Double = 0.65 // ~60-70% as shown in image
     @State private var volume: Double = 0.25 // ~20-30% as shown in image
     
-    // State for small buttons
+    // State for small buttons (each independent)
     @State private var isWiFiOn = true
-    @State private var isFlashlightOn = false
+    @State private var isBluetoothOn = true
     @State private var isAirplaneModeOn = false
-    @State private var isBatterySaverOn = true
+    @State private var isCellularOn = true
+    @State private var isFocusOn = false
+    @State private var isOrientationLockOn = false
+    @State private var isFlashlightOn = false
+    @State private var isTimerOn = false
+    @State private var isVpnOn = false
+    @State private var isCameraOn = false
     @State private var isDarkModeOn = false
+    @State private var isLowPowerOn = false
+    @State private var isHotspotOn = false
     
     var body: some View {
         ZStack {
@@ -28,52 +36,41 @@ struct ControlCenterView: View {
             VStack(spacing: 30) {
                 // Small buttons grid
                 LazyVGrid(columns: Array(repeating: GridItem(.fixed(80), spacing: 20), count: 4), spacing: 20) {
+                    // Connectivity
+                    CCButton(icon: "airplane", isOn: $isAirplaneModeOn, iconColorOn: .orange, iconColorOff: .white) {
+                        print("Airplane Mode: \(isAirplaneModeOn)")
+                    }
+                    CCButton(icon: "antenna.radiowaves.left.and.right", isOn: $isCellularOn, iconColorOn: .green, iconColorOff: .white) {
+                        print("Cellular: \(isCellularOn)")
+                    }
                     CCButton(icon: "wifi", isOn: $isWiFiOn, iconColorOn: .cyan, iconColorOff: .white) {
-                        // Handle flashlight toggle
-                        print("Flashlight toggled: \(isFlashlightOn)")
+                        print("Wi‑Fi: \(isWiFiOn)")
                     }
-                    
-                    CCButton(icon: "battery.25percent", isOn: $isBatterySaverOn, iconColorOn: .yellow, iconColorOff: .white) {
-                        // Handle battery saver toggle
-                        print("Battery saver toggled: \(isBatterySaverOn)")
+                    CCButton(icon: "personalhotspot", isOn: $isHotspotOn, iconColorOn: .green, iconColorOff: .white) {
+                        print("Personal Hotspot: \(isHotspotOn)")
                     }
-                    
-                    CCButton(icon: "personalhotspot", isOn: .constant(false)) {
-                        // Handle airplane mode toggle
-                        print("Airplane mode toggled: \(isAirplaneModeOn)")
-                    }
-                    
-                    CCButton(icon: "circle.lefthalf.filled", isOn: $isDarkModeOn) {
-                        // Handle dark mode toggle
-                        print("Dark mode toggled: \(isDarkModeOn)")
+
+                    VStack(spacing: 20) {
+                        // Focus & orientation
+                        CCButton(icon: "moon.fill", isOn: $isFocusOn, iconColorOn: .purple, iconColorOff: .white) {
+                            print("Focus: \(isFocusOn)")
+                        }
+                        CCButton(icon: "lock.rotation", isOn: $isOrientationLockOn, iconColorOn: .red, iconColorOff: .white) {
+                            print("Orientation Lock: \(isOrientationLockOn)")
+                        }
                     }
                     
                     VStack(spacing: 20) {
-                        CCButton(icon: "lock.rotation", isOn: $isAirplaneModeOn, iconColorOn: .red, iconColorOff: .white) {
-                            // Handle airplane mode toggle
-                            print("Airplane mode toggled: \(isAirplaneModeOn)")
+                        // Appearance & power stacked for alignment
+                        CCButton(icon: "circle.lefthalf.filled", isOn: $isDarkModeOn, iconColorOn: .yellow, iconColorOff: .white) {
+                            print("Dark Mode: \(isDarkModeOn)")
                         }
-                        
-                        CCButton(icon: "circle.lefthalf.filled", isOn: $isDarkModeOn) {
-                            // Handle dark mode toggle
-                            print("Dark mode toggled: \(isDarkModeOn)")
+                        CCButton(icon: "battery.25percent", isOn: $isLowPowerOn, iconColorOn: .yellow, iconColorOff: .white) {
+                            print("Low Power Mode: \(isLowPowerOn)")
                         }
                     }
-                    
-                    
-                    VStack(spacing: 20) {
-                        CCButton(icon: "wifi", isOn: .constant(false), iconColorOn: .cyan, iconColorOff: .white) {
-                            // Handle flashlight toggle
-                            print("Flashlight toggled: \(isFlashlightOn)")
-                        }
-                        
-                        CCButton(icon: "battery.25percent", isOn: $isBatterySaverOn, iconColorOn: .yellow, iconColorOff: .white) {
-                            // Handle battery saver toggle
-                            print("Battery saver toggled: \(isBatterySaverOn)")
-                        }
-                    }
-                    
-                    // Base icon initializer (no step icons)
+
+                    // Sliders
                     CCVerticalSlider(
                         value: $brightness,
                         icon: "sun.max.fill",
@@ -81,8 +78,6 @@ struct ControlCenterView: View {
                         iconColorInactive: .white,
                         iconColorActive: .yellow
                     )
-                    
-                    // Step icons initializer (no base icon)
                     CCVerticalSlider(
                         value: $volume,
                         zeroIcon: "speaker.slash.fill",
@@ -94,29 +89,29 @@ struct ControlCenterView: View {
                             CCVerticalSlider.StepIcon(threshold: 0.66, symbolName: "speaker.wave.3.fill")
                         ]
                     )
-                    
-                    CCButton(icon: "flashlight.on.fill", isOn: $isFlashlightOn) {
-                        // Handle flashlight toggle
-                        print("Flashlight toggled: \(isFlashlightOn)")
-                    }
-                    
-                    CCButton(icon: "ruler.fill", isOn: .constant(false), iconColorOn: .black, iconColorOff: .white) {
-                        // Handle battery saver toggle
-                        print("Battery saver toggled: \(isBatterySaverOn)")
-                    }
-                    
-                    CCButton(icon: "airplane", isOn: .constant(false), iconColorOn: .orange, iconColorOff: .white) {
-                        // Handle airplane mode toggle
-                        print("Airplane mode toggled: \(isAirplaneModeOn)")
-                    }
-                    
-                    CCButton(icon: "circle.lefthalf.filled", isOn: $isDarkModeOn) {
-                        // Handle dark mode toggle
-                        print("Dark mode toggled: \(isDarkModeOn)")
-                    }
-                }
 
-            }.padding()
+                    // Utilities
+                    CCButton(icon: "flashlight.on.fill", isOn: $isFlashlightOn, iconColorOn: .yellow, iconColorOff: .white) {
+                        print("Flashlight: \(isFlashlightOn)")
+                    }
+                    CCButton(icon: "timer", isOn: $isTimerOn, iconColorOn: .orange, iconColorOff: .white) {
+                        print("Timer: \(isTimerOn)")
+                    }
+                    CCButton(icon: "network", isOn: $isVpnOn, iconColorOn: .orange, iconColorOff: .white) {
+                        print("VPN: \(isVpnOn)")
+                    }
+                    CCButton(icon: "camera.fill", isOn: $isCameraOn, iconColorOn: .white, iconColorOff: .white) {
+                        print("Camera: \(isCameraOn)")
+                    }
+
+                
+                }
+                
+                Spacer()
+
+            }.padding(50)
+            
+            
         }
     }
 }
