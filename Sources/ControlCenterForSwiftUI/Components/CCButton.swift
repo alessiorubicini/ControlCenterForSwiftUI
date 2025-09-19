@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+/// A Control Center–style button with glass/blur aesthetics and flexible content.
+///
+/// CCButton renders either:
+/// - a circular icon-only button, or
+/// - a rounded rectangle with an icon and optional text label.
+///
+/// The visual state reacts to `isOn`, switching icon color and background accordingly.
+/// Use `glassEffect` to control the intensity/behavior of the glass effect.
 struct CCButton: View {
     let icon: String
     @Binding var isOn: Bool
@@ -16,7 +24,16 @@ struct CCButton: View {
     let text: String?
     let glassEffect: Glass
     
-    // Custom initializer with default values
+    /// Creates a Control Center–style button.
+    ///
+    /// - Parameters:
+    ///   - icon: The SF Symbol name to display.
+    ///   - isOn: Binding for the button's on/off state. Defaults to `false`.
+    ///   - iconColorOn: Icon color when `isOn` is `true`. Defaults to `.white`.
+    ///   - iconColorOff: Icon color when `isOn` is `false`. Defaults to `.white`.
+    ///   - text: Optional label shown next to the icon. When provided, the button uses a rounded rectangle layout.
+    ///   - glassEffect: The glass effect style applied to the button background. Defaults to `.regular`.
+    ///   - onTap: Closure called after the on/off toggle animation completes. Defaults to no-op.
     init(
         icon: String, 
         isOn: Binding<Bool> = .constant(false), 
@@ -44,7 +61,7 @@ struct CCButton: View {
         }) {
             if let text = text {
                 RoundedRectangle(cornerRadius: 50.0)
-                    .glassEffect(.clear)
+                    .glassEffect(.clear.interactive())
                     .frame(width: 150, height: 68)
                     .overlay {
                         HStack(spacing: 10) {
@@ -59,20 +76,20 @@ struct CCButton: View {
                     }
                 
             } else {
-                Circle()
-                    .fill(isOn ? Color.white : Color.clear)
-                    .frame(width: 80, height: 80)
-                    .background {
-                        if !isOn {
-                            Circle()
-                                .glassEffect(glassEffect)
+                ZStack {
+                    Circle()
+                        .fill(isOn ? Color.white : Color.clear)
+                        .frame(width: 80, height: 80)
+                        .background {
+                            if !isOn {
+                                Circle()
+                            }
                         }
-                    }
-                    .overlay {
-                        Image(systemName: icon)
-                            .font(.system(size: 28, weight: .medium))
-                            .foregroundColor(isOn ? iconColorOn : iconColorOff)
-                    }
+                        
+                    Image(systemName: icon)
+                        .font(.system(size: 28, weight: .medium))
+                        .foregroundColor(isOn ? iconColorOn : iconColorOff)
+                }.glassEffect(glassEffect.interactive())
             }
 
         }

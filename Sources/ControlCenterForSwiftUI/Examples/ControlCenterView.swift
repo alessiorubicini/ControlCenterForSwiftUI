@@ -49,7 +49,7 @@ struct ControlCenterView: View {
                     }
                     
                     VStack(spacing: 20) {
-                        CCButton(icon: "lock.rotation", isOn: $isAirplaneModeOn) {
+                        CCButton(icon: "lock.rotation", isOn: $isAirplaneModeOn, iconColorOn: .red, iconColorOff: .white) {
                             // Handle airplane mode toggle
                             print("Airplane mode toggled: \(isAirplaneModeOn)")
                         }
@@ -73,18 +73,26 @@ struct ControlCenterView: View {
                         }
                     }
                     
+                    // Base icon initializer (no step icons)
                     CCVerticalSlider(
                         value: $brightness,
                         icon: "sun.max.fill",
-                        iconColorOutside: .white,
-                        iconColorInside: .yellow
+                        zeroIcon: nil,
+                        iconColorInactive: .white,
+                        iconColorActive: .yellow
                     )
                     
+                    // Step icons initializer (no base icon)
                     CCVerticalSlider(
                         value: $volume,
-                        icon: "speaker.wave.3.fill",
-                        iconColorOutside: .white,
-                        iconColorInside: .cyan
+                        zeroIcon: "speaker.slash.fill",
+                        iconColorInactive: .white,
+                        iconColorActive: .cyan,
+                        stepIcons: [
+                            CCVerticalSlider.StepIcon(threshold: 0.01, symbolName: "speaker.wave.1.fill"),
+                            CCVerticalSlider.StepIcon(threshold: 0.33, symbolName: "speaker.wave.2.fill"),
+                            CCVerticalSlider.StepIcon(threshold: 0.66, symbolName: "speaker.wave.3.fill")
+                        ]
                     )
                     
                     CCButton(icon: "flashlight.on.fill", isOn: $isFlashlightOn) {

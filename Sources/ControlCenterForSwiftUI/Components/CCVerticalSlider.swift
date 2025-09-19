@@ -10,13 +10,95 @@ import SwiftUI
 struct CCVerticalSlider: View {
     
     @Binding var value: Double
-    let icon: String
-    let iconColorOutside: Color
-    let iconColorInside: Color
-    let glassEffect: Glass = .regular
+    let icon: String? // Optional to support the stepIcons-only initializer
+    let zeroIcon: String?
+    let iconColorInactive: Color
+    let iconColorActive: Color
+    let glassEffect: Glass
+    
+    /// Optional icons mapped to thresholds of `value` in the range 0...1.
+    /// The icon for the highest threshold less than or equal to `value` is used.
+    /// Example: [(0.01, "speaker.wave.1.fill"), (0.33, "speaker.wave.2.fill"), (0.66, "speaker.wave.3.fill")]
+    struct StepIcon {
+        let threshold: Double
+        let symbolName: String
+        
+        init(threshold: Double, symbolName: String) {
+            self.threshold = threshold
+            self.symbolName = symbolName
+        }
+    }
+    let stepIcons: [StepIcon]
+    
+    /// Creates a vertical slider that displays a single base icon.
+    ///
+    /// Use this initializer when you want a consistent icon regardless of value.
+    /// If `zeroIcon` is provided, it is shown when the value is effectively zero.
+    ///
+    /// - Parameters:
+    ///   - value: A binding to the slider's normalized value in the range 0...1.
+    ///   - icon: The SF Symbol name shown at the bottom of the slider.
+    ///   - zeroIcon: Optional SF Symbol shown when the value is near zero.
+    ///   - iconColorInactive: Icon color when the filled area is below the internal threshold.
+    ///   - iconColorActive: Icon color when the filled area exceeds the internal threshold.
+    ///   - glassEffect: The glass effect style applied to the slider track.
+    init(
+        value: Binding<Double>,
+        icon: String,
+        zeroIcon: String? = nil,
+        iconColorInactive: Color,
+        iconColorActive: Color,
+        glassEffect: Glass = .regular
+    ) {
+        self._value = value
+        self.icon = icon
+        self.zeroIcon = zeroIcon
+        self.iconColorInactive = iconColorInactive
+        self.iconColorActive = iconColorActive
+        self.glassEffect = glassEffect
+        self.stepIcons = []
+    }
+    
+    /// Creates a vertical slider that changes its icon based on value thresholds.
+    ///
+    /// Use this initializer to provide a set of step icons that progress as the value increases.
+    /// The icon for the highest `threshold` less than or equal to the current value is used;
+    /// when the value is greater than zero but below the first threshold, the first step icon is shown.
+    /// If `zeroIcon` is provided, it is shown when the value is effectively zero.
+    ///
+    /// - Parameters:
+    ///   - value: A binding to the slider's normalized value in the range 0...1.
+    ///   - zeroIcon: Optional SF Symbol shown when the value is near zero.
+    ///   - iconColorInactive: Icon color when the filled area is below the internal threshold.
+    ///   - iconColorActive: Icon color when the filled area exceeds the internal threshold.
+    ///   - glassEffect: The glass effect style applied to the slider track.
+    ///   - stepIcons: An ordered list of `(threshold, symbolName)` pairs. Thresholds are clamped to 0...1 and sorted ascending.
+    init(
+        value: Binding<Double>,
+        zeroIcon: String? = nil,
+        iconColorInactive: Color,
+        iconColorActive: Color,
+        glassEffect: Glass = .regular,
+        stepIcons: [StepIcon]
+    ) {
+        self._value = value
+        self.icon = nil
+        self.zeroIcon = zeroIcon
+        self.iconColorInactive = iconColorInactive
+        self.iconColorActive = iconColorActive
+        self.glassEffect = glassEffect
+        // Ensure thresholds are clamped to 0...1 and sorted ascending for predictable behavior
+        self.stepIcons = stepIcons
+            .map { StepIcon(threshold: min(max($0.threshold, 0), 1), symbolName: $0.symbolName) }
+            .sorted { $0.threshold < $1.threshold }
+    }
+    
+    
     
     // Static threshold for color change
-    private static let colorChangeThreshold: Double = 0.15
+    private static let colorChangeThreshold: Double = 0.20
+    // Treat very small values as zero for icon purposes
+    private static let zeroEpsilon: Double = 0.001
     
     // New state variable to track the drag's "overshoot" for progressive stretching.
     @State private var dragOffset: CGFloat = 0
@@ -48,6 +130,29 @@ struct CCVerticalSlider: View {
         }
     }
     
+    // Decide which icon to show based on current value and step icons
+    private var currentIconName: String {
+        // Near-zero uses zeroIcon when available
+        if value <= Self.zeroEpsilon, let zeroIcon = zeroIcon { return zeroIcon }
+        
+        if !stepIcons.isEmpty {
+            // Find the last step whose threshold is <= value
+            var chosen: String? = nil
+            for step in stepIcons {
+                if value >= step.threshold {
+                    chosen = step.symbolName
+                } else {
+                    break
+                }
+            }
+            // If none matched but value > 0, use the first step icon (covers values below first threshold)
+            return chosen ?? stepIcons.first!.symbolName
+        }
+        
+        // Fall back to base icon when using the base-icon initializer
+        return icon ?? ""
+    }
+    
     var body: some View {
         ZStack {
             // Background track
@@ -72,10 +177,11 @@ struct CCVerticalSlider: View {
             VStack {
                 Spacer()
                 
-                Image(systemName: icon)
+                Image(systemName: currentIconName)
                     .font(.system(size: 24, weight: .medium))
-                    .foregroundColor(value > Self.colorChangeThreshold ? iconColorInside : iconColorOutside)
+                    .foregroundColor(value > Self.colorChangeThreshold ? iconColorActive : iconColorInactive)
                     .animation(.easeInOut(duration: 0.2), value: value > Self.colorChangeThreshold)
+                    .contentTransition(.symbolEffect(.replace.byLayer))
             }.padding(.bottom, 30)
         }
         .frame(width: sliderWidth, height: sliderHeight)
@@ -122,7 +228,7 @@ struct CCVerticalSlider: View {
                     dragOffset = 0
                 }
         )
+        
     }
 }
-
 

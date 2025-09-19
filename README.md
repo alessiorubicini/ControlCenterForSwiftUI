@@ -2,7 +2,7 @@
   <img width="300" height="300" src="/Resources/icon.png" alt="Package Logo">
   <h1><b>Control Center for SwiftUI</b></h1>
   <p>
-    A Swift package providing SwiftUI components and modifiers designed to bring Apple Intelligence-style UI effects and animations to your applications.
+    A Swift package recreating and bringing iOS 26 control center components directly into SwiftUI.  
     <br>
   </p>
 </div>
@@ -32,6 +32,17 @@
 </div>
 
 ![Package Preview](/Resources/Preview.png)
+
+## What this package offers
+- **Control Center building blocks**: Drop-in, modern controls that feel native, inspired by iOS 26 Control Center.
+- **Interactive vertical sliders**: Fluid, springy sliders with glass aesthetics; show a single icon or automatically change icons by value steps (perfect for brightness or volume).
+- **Togglable buttons**: Polished Control Center–style buttons that can be icon-only or include a short label; visually respond to state.
+- **Liquid Glass**: Tasteful liquid glass built in.
+- **Delightful interactions**: Subtle animations, haptics, and symbol transitions designed to feel responsive and premium.
+- **Highly customizable**: Configure icons, step thresholds, colors, and visual weight to match your brand or platform look.
+- **Accessible by design**: Works with Dynamic Type and VoiceOver labels/traits to ensure inclusive experiences.
+- **Cross‑platform SwiftUI**: Ready for iOS, macOS, watchOS, tvOS, and visionOS using a single Swift package.
+- **Lightweight and composable**: Use just what you need; components fit neatly into your existing SwiftUI layouts.
 
 ## Installation
 Required iOS, macOS, watchOS, tvOS or visionOS 26.0 or above.
